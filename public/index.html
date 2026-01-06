@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fit Buddy - Your Nutrition Companion</title>
+  <meta name="description"
+    content="A friendly, behavior-based nutrition chatbot designed for Indian users. Build healthy eating habits with gentle nudges and support.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="chat-container">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-left">
+        <div class="bot-avatar">
+          <span class="avatar-emoji">🥗</span>
+        </div>
+        <div class="bot-info">
+          <h1 class="bot-name">Fit Buddy</h1>
+          <div class="bot-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Online Now</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </button>
+      </div>
+      <!-- Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <button class="dropdown-item" id="editProfile">
+          <span>👤</span> My Profile
+        </button>
+        <button class="dropdown-item" id="viewProgress">
+          <span>📊</span> View Progress
+        </button>
+        <button class="dropdown-item" id="resetChat">
+          <span>🔄</span> Reset Chat
+        </button>
+      </div>
+    </header>
+
+    <!-- Calorie Tracker Bar -->
+    <div class="calorie-tracker" id="calorieTracker">
+      <div class="calorie-info">
+        <span class="calorie-icon">🔥</span>
+        <div class="calorie-text">
+          <span class="calorie-label">Today's Calories</span>
+          <span class="calorie-value"><span id="totalCalories">0</span> kcal</span>
+        </div>
+      </div>
+      <div class="calorie-progress">
+        <div class="calorie-bar">
+          <div class="calorie-bar-fill" id="calorieBarFill"></div>
+        </div>
+        <span class="calorie-goal" id="calorieGoalText">Goal: 2000</span>
+      </div>
+    </div>
+
+    <!-- Messages Area -->
+    <main class="messages-area" id="messagesArea">
+      <!-- Welcome message will be added by JS -->
+    </main>
+
+    <!-- Quick Replies -->
+    <div class="quick-replies-container" id="quickRepliesContainer">
+      <!-- Quick replies will be added dynamically -->
+    </div>
+
+    <!-- Input Area -->
+    <footer class="input-area">
+      <div class="input-wrapper">
+        <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+        <button class="send-btn" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+      <div class="modal-content profile-modal">
+        <div class="modal-header">
+          <h2>My Profile 👤</h2>
+          <button class="modal-close" id="closeProfileModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="profileForm">
+            <div class="form-group">
+              <label for="heightInput">Height (cm)</label>
+              <input type="number" id="heightInput" placeholder="e.g., 170" min="100" max="250" step="1">
+            </div>
+            <div class="form-group">
+              <label for="weightInput">Weight (kg)</label>
+              <input type="number" id="weightInput" placeholder="e.g., 65" min="30" max="300" step="0.1">
+            </div>
+            <div class="form-group">
+              <label for="goalSelect">Fitness Goal</label>
+              <select id="goalSelect">
+                <option value="weight_loss">🎯 Weight Loss</option>
+                <option value="weight_gain">💪 Weight Gain</option>
+                <option value="maintenance" selected>⚖️ Maintain Weight</option>
+                <option value="muscle_building">🏋️ Build Muscle</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="calorieGoalInput">Daily Calorie Goal</label>
+              <input type="number" id="calorieGoalInput" placeholder="e.g., 2000" min="1000" max="5000" step="50">
+            </div>
+            <div class="bmi-display" id="bmiDisplay">
+              <!-- BMI will be calculated and shown here -->
+            </div>
+            <button type="submit" class="save-profile-btn">Save Profile</button>
+          </form>
+          <p class="profile-hint">💡 Ask Fit Buddy "What should I eat?" for personalized advice based on your goals!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal-overlay" id="progressModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Your Progress 📊</h2>
+          <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="streak-display">
+            <span class="streak-icon">🔥</span>
+            <span class="streak-count" id="streakCount">0</span>
+            <span class="streak-label">Day Streak</span>
+          </div>
+          <div class="weekly-progress">
+            <h3>This Week</h3>
+            <div class="progress-bars" id="weeklyBars">
+              <!-- Weekly bars will be added by JS -->
+            </div>
+          </div>
+          <div class="weekly-calories">
+            <h3>Weekly Calories</h3>
+            <div class="calorie-history" id="calorieHistory">
+              <!-- Calorie history will be added by JS -->
+            </div>
+          </div>
+          <p class="progress-message" id="progressMessage">Start logging meals to track your progress! 💪</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
