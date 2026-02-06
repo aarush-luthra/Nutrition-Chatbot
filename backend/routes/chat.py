@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from backend.services.openai_service import (
     get_system_prompt_with_profile,
     chat_completion,
-    extract_calories
+    extract_metadata
 )
 
 chat_bp = Blueprint('chat', __name__)
@@ -53,12 +53,13 @@ def chat():
             system_msg = history[0]
             conversations[session_id] = [system_msg] + history[-20:]
         
-        # Extract calories if present
-        clean_response, calories = extract_calories(bot_response)
+        # Extract calories and food name if present
+        clean_response, calories, food_name = extract_metadata(bot_response)
         
         return jsonify({
             'response': clean_response,
             'calories': calories,
+            'food_name': food_name,
             'sessionId': session_id
         })
         

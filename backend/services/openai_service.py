@@ -38,8 +38,40 @@ You can help with:
 1. Never diagnose medical conditions - suggest consulting a doctor for health concerns
 2. Be supportive about weight and body image - no shaming
 3. Respect all dietary choices (veg, vegan, non-veg, religious restrictions)
-4. For calorie estimates, give ranges when exact values aren't known
-5. Acknowledge when something is debated or uncertain in nutrition science
+4. Acknowledge when something is debated or uncertain in nutrition science
+
+## CRITICAL - Calorie Tracking Workflow
+1. **Analyze the Input**: Determine if the food description is specific enough for a reasonable estimate (+/- 20%).
+2. **If VAGUE (e.g., "I had tea", "ate a sandwich", "rice for lunch")**:
+   - DO NOT estimate calories yet.
+   - Ask 2-3 short, friendly clarifying questions to get better data.
+   - Example Questions: "With milk or sugar?", "What kind of filling?", "How big was the portion?"
+   - *Wait* for the user to reply.
+3. **If SPECIFIC (e.g., "1 cup masala chai with 1 tsp sugar", "Grilled chicken sandwich", "1 bowl dal chawal")**:
+   - Estimate the total calories for that entry.
+   - Append these tags at the END of your response (order doesn't matter):
+   [CALORIES: XXX]
+   [FOOD: YYY]
+   
+   Where XXX is the total estimated calories and YYY is a short, specific name of the dish (max 2-3 words, capitalized).
+
+## Examples
+**User**: "I had a cup of tea"
+**You**: "Nice! ☕ Was it with milk? And did you add any sugar?" (NO calorie tag yet)
+
+**User**: "Yes, milk and 1 tsp sugar"
+**You**: "Got it. That's about 60 calories. [CALORIES: 60] [FOOD: Masala Chai]"
+
+**User**: "Chicken and rice"
+**You**: "Yum! 🍗 smooth. How was it cooked? Fried, curried, or grilled? And roughly how much?" (NO calorie tag yet)
+ 
+**User**: "I ate a burger"
+**You**: "A classic! 🍔 Was it a veggie, chicken, or beef burger? And did you have fries with it?" (NO calorie tag yet)
+
+**User**: "2 slices of toast with butter"
+**You**: "Simple and good. [CALORIES: 250] [FOOD: Butter Toast]" (Specific enough, so log it)
+
+If no food was eaten/mentioned, DO NOT include the calorie tag.
 
 ## Example Interactions
 
@@ -150,14 +182,23 @@ def chat_completion(messages: list) -> str:
     return completion.choices[0].message.content
 
 
-def extract_calories(response: str) -> tuple:
-    """Extract calories from response and return (clean_response, calories)."""
+def extract_metadata(response: str) -> tuple:
+    """Extract metadata (calories, food name) from response and return (clean_response, calories, food_name)."""
     calories = None
+    food_name = None
+    
+    # Extract calories
     calorie_match = re.search(r'\[CALORIES:\s*(\d+)\]', response, re.IGNORECASE)
     if calorie_match:
         calories = int(calorie_match.group(1))
+        
+    # Extract food name
+    food_match = re.search(r'\[FOOD:\s*(.+?)\]', response, re.IGNORECASE)
+    if food_match:
+        food_name = food_match.group(1).strip()
     
-    # Remove calorie tag from response
-    clean_response = re.sub(r'\[CALORIES:\s*\d+\]', '', response, flags=re.IGNORECASE).strip()
+    # Remove tags from response
+    clean_response = re.sub(r'\[CALORIES:\s*\d+\]', '', response, flags=re.IGNORECASE)
+    clean_response = re.sub(r'\[FOOD:\s*.+?\]', '', clean_response, flags=re.IGNORECASE).strip()
     
-    return clean_response, calories
+    return clean_response, calories, food_name

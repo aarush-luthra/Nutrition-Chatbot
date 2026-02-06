@@ -19,20 +19,20 @@ def create_app():
     app.register_blueprint(chat_bp)
     app.register_blueprint(profile_bp)
     
-    # Serve frontend files
-    frontend_path = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+    # Serve frontend files from public folder
+    public_path = os.path.join(os.path.dirname(__file__), '..', 'public')
     
     @app.route('/')
     def serve_index():
-        return send_from_directory(frontend_path, 'index.html')
+        return send_from_directory(public_path, 'index.html')
+
+    @app.route('/chat')
+    def serve_chat():
+        return send_from_directory(public_path, 'chat.html')
     
-    @app.route('/css/<path:filename>')
-    def serve_css(filename):
-        return send_from_directory(os.path.join(frontend_path, 'css'), filename)
-    
-    @app.route('/js/<path:filename>')
-    def serve_js(filename):
-        return send_from_directory(os.path.join(frontend_path, 'js'), filename)
+    @app.route('/<path:filename>')
+    def serve_static(filename):
+        return send_from_directory(public_path, filename)
     
     return app
 

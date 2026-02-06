@@ -11,6 +11,7 @@ const state = {
     profile: JSON.parse(localStorage.getItem('fitbuddy_profile') || 'null'),
     calorieLog: JSON.parse(localStorage.getItem('fitbuddy_calories') || '{}'),
     calorieGoal: parseInt(localStorage.getItem('fitbuddy_calorie_goal') || '2000'),
+    foodItems: JSON.parse(localStorage.getItem('fitbuddy_food_items') || '[]'),
 };
 
 // Save session ID
@@ -21,8 +22,6 @@ const messagesArea = document.getElementById('messagesArea');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const quickRepliesContainer = document.getElementById('quickRepliesContainer');
-const menuBtn = document.getElementById('menuBtn');
-const dropdownMenu = document.getElementById('dropdownMenu');
 const resetChatBtn = document.getElementById('resetChat');
 const viewProgressBtn = document.getElementById('viewProgress');
 const editProfileBtn = document.getElementById('editProfile');
@@ -48,14 +47,22 @@ const goalSelect = document.getElementById('goalSelect');
 const calorieGoalInput = document.getElementById('calorieGoalInput');
 const bmiDisplay = document.getElementById('bmiDisplay');
 
+// Food tracker elements
+const foodTracker = document.getElementById('foodTracker');
+const foodTrackerToggle = document.getElementById('foodTrackerToggle');
+const foodList = document.getElementById('foodList');
+const foodEmpty = document.getElementById('foodEmpty');
+const mealCountEl = document.getElementById('mealCount');
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     checkAndResetDailyCalories();
-    initializeChat();
+    if (messagesArea) initializeChat();
     setupEventListeners();
-    updateProgress();
-    updateCalorieDisplay();
-    loadProfile();
+    if (streakCount) updateProgress();
+    if (totalCaloriesEl) updateCalorieDisplay();
+    if (profileForm) loadProfile();
+    if (foodTracker) initFoodTracker();
 });
 
 // Generate unique session ID
@@ -90,6 +97,8 @@ function addCalories(amount) {
 
 // Update calorie display
 function updateCalorieDisplay() {
+    if (!totalCaloriesEl || !calorieBarFill || !calorieGoalText) return;
+
     const todayCalories = getTodayCalories();
     totalCaloriesEl.textContent = todayCalories;
 
@@ -287,85 +296,89 @@ function getTimeBasedGreeting() {
 // Setup event listeners
 function setupEventListeners() {
     // Send message on button click
-    sendBtn.addEventListener('click', handleSendMessage);
+    if (sendBtn) sendBtn.addEventListener('click', handleSendMessage);
 
     // Send message on Enter key
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
-    });
-
-    // Toggle dropdown menu
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('active');
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', () => {
-        dropdownMenu.classList.remove('active');
-    });
+    if (messageInput) {
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
+    }
 
     // Reset chat
-    resetChatBtn.addEventListener('click', async () => {
-        dropdownMenu.classList.remove('active');
-        await resetConversation();
-    });
+    if (resetChatBtn) {
+        resetChatBtn.addEventListener('click', async () => {
+            await resetConversation();
+        });
+    }
 
     // View progress
-    viewProgressBtn.addEventListener('click', () => {
-        dropdownMenu.classList.remove('active');
-        updateProgress();
-        progressModal.classList.add('active');
-    });
+    if (viewProgressBtn) {
+        viewProgressBtn.addEventListener('click', () => {
+            updateProgress();
+            if (progressModal) progressModal.classList.add('active');
+        });
+    }
 
     // Edit profile
-    editProfileBtn.addEventListener('click', () => {
-        dropdownMenu.classList.remove('active');
-        loadProfile();
-        profileModal.classList.add('active');
-    });
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            loadProfile();
+            if (profileModal) profileModal.classList.add('active');
+        });
+    }
 
     // Close modals
-    closeModalBtn.addEventListener('click', () => {
-        progressModal.classList.remove('active');
-    });
+    if (closeModalBtn && progressModal) {
+        closeModalBtn.addEventListener('click', () => {
+            progressModal.classList.remove('active');
+        });
+    }
 
-    closeProfileModalBtn.addEventListener('click', () => {
-        profileModal.classList.remove('active');
-    });
+    if (closeProfileModalBtn && profileModal) {
+        closeProfileModalBtn.addEventListener('click', () => {
+            profileModal.classList.remove('active');
+        });
+    }
 
     // Close modals on overlay click
-    progressModal.addEventListener('click', (e) => {
-        if (e.target === progressModal) {
-            progressModal.classList.remove('active');
-        }
-    });
+    if (progressModal) {
+        progressModal.addEventListener('click', (e) => {
+            if (e.target === progressModal) {
+                progressModal.classList.remove('active');
+            }
+        });
+    }
 
-    profileModal.addEventListener('click', (e) => {
-        if (e.target === profileModal) {
-            profileModal.classList.remove('active');
-        }
-    });
+    if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                profileModal.classList.remove('active');
+            }
+        });
+    }
 
     // Profile form
-    heightInput.addEventListener('input', updateBMIDisplay);
-    weightInput.addEventListener('input', updateBMIDisplay);
+    if (heightInput) heightInput.addEventListener('input', updateBMIDisplay);
+    if (weightInput) weightInput.addEventListener('input', updateBMIDisplay);
 
-    profileForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const saved = await saveProfile();
-        if (saved) {
-            profileModal.classList.remove('active');
-            addBotMessage("Profile updated! 🎉 Now I can give you personalized advice. Ask me 'What should I eat?' anytime!");
-            showQuickReplies([
-                { text: "What should I eat?", value: "What should I eat based on my fitness goals and body?" },
-                { text: "Thanks! 😊", value: "Thanks for the update!" }
-            ]);
-        }
-    });
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const saved = await saveProfile();
+            if (saved) {
+                if (profileModal) profileModal.classList.remove('active');
+                addBotMessage("Profile updated! 🎉 Now I can give you personalized advice. Ask me 'What should I eat?' anytime!");
+                showQuickReplies([
+                    { text: "What should I eat?", value: "What should I eat based on my fitness goals and body?" },
+                    { text: "Thanks! 😊", value: "Thanks for the update!" }
+                ]);
+            }
+        });
+    }
 }
 
 // Handle sending messages
@@ -431,7 +444,15 @@ async function sendToAPI(message) {
 
             // Add calories if returned
             if (data.calories) {
-                addCalories(data.calories);
+                // Capture the individual meal calories FIRST
+                const mealCalories = parseInt(data.calories);
+                const foodName = data.food_name || extractFoodName(message) || 'Meal';
+
+                // Add to food tracker with individual calories
+                addFoodItem(foodName, mealCalories);
+
+                // Then add to daily total
+                addCalories(mealCalories);
             }
 
             // Show contextual quick replies
@@ -721,6 +742,18 @@ async function resetConversation() {
         messagesArea.innerHTML = '';
         hideQuickReplies();
 
+        // Reset today's calories
+        const today = new Date().toDateString();
+        state.calorieLog[today] = 0;
+        localStorage.setItem('fitbuddy_calories', JSON.stringify(state.calorieLog));
+        updateCalorieDisplay();
+
+        // Reset food items
+        state.foodItems = [];
+        localStorage.setItem('fitbuddy_food_items', JSON.stringify(state.foodItems));
+        updateFoodDisplay();
+        foodTracker.classList.remove('expanded');
+
         // Reinitialize
         addBotMessage("Chat reset! 🔄 Let's start fresh. How can I help you today?");
         showQuickReplies([
@@ -735,6 +768,15 @@ async function resetConversation() {
 
 // Format message (handle line breaks)
 function formatMessage(text) {
+    if (typeof marked !== 'undefined') {
+        // Set options to handle line breaks like the old behavior
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+        return marked.parse(text);
+    }
+    // Fallback if marked is not loaded
     return escapeHtml(text).replace(/\n/g, '<br>');
 }
 
@@ -745,7 +787,158 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Extract food name from message
+function extractFoodName(message) {
+    const lowerMsg = message.toLowerCase();
+
+    // Common food patterns
+    const foods = [
+        'poha', 'idli', 'dosa', 'upma', 'paratha', 'aloo paratha', 'paneer paratha',
+        'dal chawal', 'dal rice', 'roti sabzi', 'roti', 'chapati', 'rice',
+        'khichdi', 'biryani', 'pulao', 'rajma chawal', 'chole bhature',
+        'samosa', 'pakora', 'bhaji', 'pav bhaji', 'vada pav',
+        'chai', 'tea', 'coffee', 'lassi', 'buttermilk', 'chaas',
+        'omelette', 'eggs', 'toast', 'bread', 'butter',
+        'salad', 'fruits', 'banana', 'apple', 'mango',
+        'pizza', 'burger', 'pasta', 'noodles', 'maggi',
+        'lunch', 'dinner', 'breakfast', 'snack', 'meal'
+    ];
+
+    for (const food of foods) {
+        if (lowerMsg.includes(food)) {
+            // Capitalize first letter
+            return food.charAt(0).toUpperCase() + food.slice(1);
+        }
+    }
+
+    // Try to extract after common patterns
+    const patterns = [
+        /(?:had|ate|eaten)\s+(.+?)(?:\s+for|\s+today|\.|$)/i,
+        /(?:i\s+had)\s+(.+?)(?:\s+for|\s+today|\.|$)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = message.match(pattern);
+        if (match && match[1]) {
+            const extracted = match[1].trim();
+            if (extracted.length > 2 && extracted.length < 30) {
+                return extracted.charAt(0).toUpperCase() + extracted.slice(1);
+            }
+        }
+    }
+
+    return null;
+}
+
 // Scroll to bottom
 function scrollToBottom() {
     messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+// ========================================
+// Food Tracker Functions
+// ========================================
+
+// Initialize food tracker
+function initFoodTracker() {
+    // Filter to today's items only
+    const today = new Date().toDateString();
+    state.foodItems = state.foodItems.filter(item => item.date === today);
+    localStorage.setItem('fitbuddy_food_items', JSON.stringify(state.foodItems));
+
+    // Toggle food list visibility
+    foodTrackerToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        foodTracker.classList.toggle('expanded');
+    });
+
+    // Update display
+    updateFoodDisplay();
+}
+
+// Add food item to tracker
+function addFoodItem(name, calories) {
+    const today = new Date().toDateString();
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    const item = {
+        id: Date.now(),
+        name: name,
+        calories: calories,
+        time: timeStr,
+        date: today
+    };
+
+    state.foodItems.push(item);
+    localStorage.setItem('fitbuddy_food_items', JSON.stringify(state.foodItems));
+    updateFoodDisplay();
+
+    // Auto-expand the food tracker when item is added
+    foodTracker.classList.add('expanded');
+}
+
+// Remove food item from tracker
+function removeFoodItem(id) {
+    const itemIndex = state.foodItems.findIndex(item => item.id === id);
+    if (itemIndex === -1) return;
+
+    const item = state.foodItems[itemIndex];
+
+    // Remove from array
+    state.foodItems.splice(itemIndex, 1);
+    localStorage.setItem('fitbuddy_food_items', JSON.stringify(state.foodItems));
+
+    // Subtract calories from today's total
+    const today = new Date().toDateString();
+    state.calorieLog[today] = Math.max(0, (state.calorieLog[today] || 0) - item.calories);
+    localStorage.setItem('fitbuddy_calories', JSON.stringify(state.calorieLog));
+
+    updateCalorieDisplay();
+    updateFoodDisplay();
+}
+
+// Update food display
+function updateFoodDisplay() {
+    const today = new Date().toDateString();
+    const todayItems = state.foodItems.filter(item => item.date === today);
+
+    // Update meal count
+    mealCountEl.textContent = todayItems.length;
+
+    // Clear and rebuild list
+    foodList.innerHTML = '';
+
+    if (todayItems.length === 0) {
+        foodList.innerHTML = `
+            <div class="food-empty">
+                <span>No meals logged yet today</span>
+            </div>
+        `;
+    } else {
+        todayItems.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'food-item';
+            itemEl.innerHTML = `
+                <div class="food-item-info">
+                    <span class="food-item-name">${escapeHtml(item.name)}</span>
+                    <div class="food-item-meta">
+                        <span class="food-item-calories">${item.calories} kcal</span>
+                        <span>•</span>
+                        <span>${item.time}</span>
+                    </div>
+                </div>
+                <button class="food-item-remove" data-id="${item.id}" title="Remove">×</button>
+            `;
+
+            // Add remove event listener
+            const removeBtn = itemEl.querySelector('.food-item-remove');
+            removeBtn.addEventListener('click', () => {
+                removeFoodItem(item.id);
+            });
+
+            foodList.appendChild(itemEl);
+        });
+    }
 }

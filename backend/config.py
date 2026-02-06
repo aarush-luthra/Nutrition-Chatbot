@@ -8,5 +8,5 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 class Config:
     """Application configuration."""
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-    PORT = int(os.getenv('PORT', 5000))
+    PORT = int(os.getenv('PORT', 8080))
     DEBUG = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'

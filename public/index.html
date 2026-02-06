@@ -3,164 +3,331 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fit Buddy - Your Nutrition Companion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fit Buddy - Your AI Nutrition Companion</title>
   <meta name="description"
-    content="A friendly, behavior-based nutrition chatbot designed for Indian users. Build healthy eating habits with gentle nudges and support.">
+    content="Build healthy eating habits with Fit Buddy - a friendly AI nutrition companion designed for Indian users.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <div class="chat-container">
-    <!-- Header -->
-    <header class="chat-header">
-      <div class="header-left">
-        <div class="bot-avatar">
-          <span class="avatar-emoji">🥗</span>
-        </div>
-        <div class="bot-info">
-          <h1 class="bot-name">Fit Buddy</h1>
-          <div class="bot-status">
-            <span class="status-dot"></span>
-            <span class="status-text">Online Now</span>
-          </div>
-        </div>
-      </div>
-      <div class="header-right">
-        <button class="menu-btn" id="menuBtn" aria-label="Menu">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </button>
-      </div>
-      <!-- Dropdown Menu -->
-      <div class="dropdown-menu" id="dropdownMenu">
-        <button class="dropdown-item" id="editProfile">
-          <span>👤</span> My Profile
-        </button>
-        <button class="dropdown-item" id="viewProgress">
-          <span>📊</span> View Progress
-        </button>
-        <button class="dropdown-item" id="resetChat">
-          <span>🔄</span> Reset Chat
-        </button>
-      </div>
-    </header>
-
-    <!-- Calorie Tracker Bar -->
-    <div class="calorie-tracker" id="calorieTracker">
-      <div class="calorie-info">
-        <span class="calorie-icon">🔥</span>
-        <div class="calorie-text">
-          <span class="calorie-label">Today's Calories</span>
-          <span class="calorie-value"><span id="totalCalories">0</span> kcal</span>
-        </div>
-      </div>
-      <div class="calorie-progress">
-        <div class="calorie-bar">
-          <div class="calorie-bar-fill" id="calorieBarFill"></div>
-        </div>
-        <span class="calorie-goal" id="calorieGoalText">Goal: 2000</span>
-      </div>
-    </div>
-
-    <!-- Messages Area -->
-    <main class="messages-area" id="messagesArea">
-      <!-- Welcome message will be added by JS -->
-    </main>
-
-    <!-- Quick Replies -->
-    <div class="quick-replies-container" id="quickRepliesContainer">
-      <!-- Quick replies will be added dynamically -->
-    </div>
-
-    <!-- Input Area -->
-    <footer class="input-area">
-      <div class="input-wrapper">
-        <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
-        <button class="send-btn" id="sendBtn" aria-label="Send message">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </div>
-    </footer>
-
-    <!-- Profile Modal -->
-    <div class="modal-overlay" id="profileModal">
-      <div class="modal-content profile-modal">
-        <div class="modal-header">
-          <h2>My Profile 👤</h2>
-          <button class="modal-close" id="closeProfileModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="profileForm">
-            <div class="form-group">
-              <label for="heightInput">Height (cm)</label>
-              <input type="number" id="heightInput" placeholder="e.g., 170" min="100" max="250" step="1">
-            </div>
-            <div class="form-group">
-              <label for="weightInput">Weight (kg)</label>
-              <input type="number" id="weightInput" placeholder="e.g., 65" min="30" max="300" step="0.1">
-            </div>
-            <div class="form-group">
-              <label for="goalSelect">Fitness Goal</label>
-              <select id="goalSelect">
-                <option value="weight_loss">🎯 Weight Loss</option>
-                <option value="weight_gain">💪 Weight Gain</option>
-                <option value="maintenance" selected>⚖️ Maintain Weight</option>
-                <option value="muscle_building">🏋️ Build Muscle</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="calorieGoalInput">Daily Calorie Goal</label>
-              <input type="number" id="calorieGoalInput" placeholder="e.g., 2000" min="1000" max="5000" step="50">
-            </div>
-            <div class="bmi-display" id="bmiDisplay">
-              <!-- BMI will be calculated and shown here -->
-            </div>
-            <button type="submit" class="save-profile-btn">Save Profile</button>
-          </form>
-          <p class="profile-hint">💡 Ask Fit Buddy "What should I eat?" for personalized advice based on your goals!</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Progress Modal -->
-    <div class="modal-overlay" id="progressModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Your Progress 📊</h2>
-          <button class="modal-close" id="closeModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="streak-display">
-            <span class="streak-icon">🔥</span>
-            <span class="streak-count" id="streakCount">0</span>
-            <span class="streak-label">Day Streak</span>
-          </div>
-          <div class="weekly-progress">
-            <h3>This Week</h3>
-            <div class="progress-bars" id="weeklyBars">
-              <!-- Weekly bars will be added by JS -->
-            </div>
-          </div>
-          <div class="weekly-calories">
-            <h3>Weekly Calories</h3>
-            <div class="calorie-history" id="calorieHistory">
-              <!-- Calorie history will be added by JS -->
-            </div>
-          </div>
-          <p class="progress-message" id="progressMessage">Start logging meals to track your progress! 💪</p>
-        </div>
-      </div>
-    </div>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
   </div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <span>Fit Buddy</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="/chat" class="nav-cta">
+          <span>Start Chat</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>AI-Powered Nutrition Assistant</span>
+      </div>
+      <h1 class="hero-title">
+        Your Personal
+        <span class="gradient-text">Nutrition</span>
+        Companion
+      </h1>
+      <p class="hero-subtitle">
+        Build healthy eating habits with gentle nudges, not guilt trips.
+        Designed specifically for <strong>Indian food & lifestyles</strong>.
+      </p>
+      <div class="hero-cta-group">
+        <a href="/chat" class="btn-primary">
+          <span>Start Chatting Free</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a href="#how-it-works" class="btn-secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polygon points="10,8 16,12 10,16" />
+          </svg>
+          <span>See How It Works</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="phone-mockup">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="demo-header">
+            <div class="demo-avatar">🥗</div>
+            <div class="demo-info">
+              <span class="demo-name">Fit Buddy</span>
+              <span class="demo-status"><span class="status-dot"></span> Online</span>
+            </div>
+          </div>
+          <div class="demo-messages">
+            <div class="demo-msg bot">
+              <span>Khaana ho gaya? 😊</span>
+            </div>
+            <div class="demo-msg user">
+              <span>Had dal chawal for lunch</span>
+            </div>
+            <div class="demo-msg bot">
+              <span>Bahut badhiya! 🎉 That's a healthy choice!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trusted By Section -->
+  <section class="trusted-section">
+    <div class="container">
+      <p class="trusted-label">Loved by health-conscious Indians everywhere</p>
+      <div class="trusted-logos">
+        <div class="trust-badge">🏃 Fitness Enthusiasts</div>
+        <div class="trust-badge">👩‍💼 Working Professionals</div>
+        <div class="trust-badge">👨‍👩‍👧 Families</div>
+        <div class="trust-badge">🏋️ Athletes</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Features</span>
+        <h2 class="section-title">Why Fit Buddy is <span class="gradient-text">Different</span></h2>
+        <p class="section-subtitle">No calorie obsession. No guilt trips. Just a friendly companion helping you build
+          lasting habits.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card featured">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+          </div>
+          <h3>AI Chat That Gets You</h3>
+          <p>Talk naturally in English or Hinglish. Our AI understands "2 roti aur sabzi" just as well as formal
+            descriptions.</p>
+          <div class="feature-tag">Most Popular</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+          </div>
+          <h3>Indian Food Focus</h3>
+          <p>Poha, dal chawal, roti-sabzi, khichdi — we understand your meals, not just Western diets.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+          </div>
+          <h3>Habit Streaks</h3>
+          <p>Celebrate consistency, not perfection. Build streaks for logging meals and watch your habits grow.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" />
+                <line x1="15" y1="9" x2="15.01" y2="9" />
+              </svg>
+            </div>
+          </div>
+          <h3>Zero Guilt</h3>
+          <p>Skipped lunch? No problem! We encourage, never lecture. Tomorrow is another chance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+            </div>
+          </div>
+          <h3>Personalized Goals</h3>
+          <p>Set your profile — height, weight, fitness goal — and get advice tailored just for you.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+          </div>
+          <h3>100% Private</h3>
+          <p>Your data stays yours. We don't share or sell your information. Ever.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Simple Steps</span>
+        <h2 class="section-title">Get Started in <span class="gradient-text">60 Seconds</span></h2>
+      </div>
+      <div class="steps-wrapper">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Set Your Profile</h3>
+            <p>Enter height, weight, and fitness goals. Takes less than a minute.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-icon">👤</div>
+          </div>
+        </div>
+        <div class="step-connector">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Chat Naturally</h3>
+            <p>Tell Fit Buddy about your meals in your own words — English or Hinglish!</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-icon">💬</div>
+          </div>
+        </div>
+        <div class="step-connector">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Build Habits</h3>
+            <p>Track progress, earn streaks, and develop lasting healthy eating patterns.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-icon">🎯</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2>Ready to Start Your <span class="gradient-text">Health Journey</span>?</h2>
+          <p>Join thousands of users building healthier habits with Fit Buddy. No signup required — start chatting now!
+          </p>
+          <a href="/chat" class="btn-primary btn-large">
+            <span>Start Chatting Now</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+        <div class="cta-decoration">
+          <div class="cta-circle"></div>
+          <div class="cta-circle"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a href="#" class="footer-logo">
+            <div class="logo-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span>Fit Buddy</span>
+          </a>
+          <p class="footer-desc">Your friendly AI nutrition companion. Building healthy habits, one meal at a time.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="/chat">Try Now</a>
+          </div>
+          <div class="footer-col">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Contact Us</a>
+            <a href="#">FAQ</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Fit Buddy. Made with ❤️ for healthy eating.</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
